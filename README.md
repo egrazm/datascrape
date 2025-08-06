@@ -18,9 +18,7 @@ Database/
 ├── key.env # ⚠️ No subir a GitHub: contiene tu API key (ignorada por Git)
 └── .venv/ # Entorno virtual (excluido del repo)
 
-markdown
-Copy
-Edit
+
 
 ---
 
@@ -58,28 +56,18 @@ pip install -r requirements.txt
 ▶️ Cómo ejecutar
 Activar entorno virtual:
 
-bash
-Copy
-Edit
 # En Windows
 source .venv/Scripts/activate
 Ejecutar el scraper:
 
-bash
-Copy
-Edit
 python scraper.py
 Crear la base de datos:
 
-bash
-Copy
-Edit
+
 sqlite3 libros.db < order.sql
 Abrir los notebooks para análisis exploratorio:
 
-bash
-Copy
-Edit
+
 jupyter notebook
 📂 Archivos sensibles
 Asegúrate de que el archivo key.env esté en el .gitignore y no se suba nunca al repositorio remoto, ya que contiene claves privadas.
