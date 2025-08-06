@@ -82,17 +82,27 @@ def scrapear_detalles_libro(url_libro):
     if response is None:
         return None
     soup = BeautifulSoup(response.content, "html.parser")
+    
     titulo = soup.select_one("div.product_main h1").get_text(strip=True)
     precio = soup.select_one("p.price_color").get_text(strip=True)
     stock = soup.select_one("p.instock.availability").get_text(strip=True)
     clases = soup.select_one("p.star-rating")["class"]
-    rating = [c for c in clases if c != "star-rating"][0]  # extrae el rating (Ej: "Three")
-    upc = soup.select_one("th:contains('UPC') + td")       # selecciona el UPC
+    rating = [c for c in clases if c != "star-rating"][0]
+    upc = soup.select_one("th:contains('UPC') + td")
     upc = upc.get_text(strip=True) if upc else "N/A"
-    autores = obtener_autor_por_titulo(titulo)             # usa Google Books para obtener el autor
+    autores = obtener_autor_por_titulo(titulo)
+
+    # EXTRAER CATEGORÍA DESDE BREADCRUMB
+    breadcrumb = soup.select("ul.breadcrumb li a")
+    if len(breadcrumb) >= 3:
+        categoria = breadcrumb[2].get_text(strip=True)
+    else:
+        categoria = "Desconocida"
+
     return {
         "titulo": titulo,
         "autores": autores,
+        "categoria": categoria,
         "precio": precio,
         "stock": stock,
         "rating": rating,
@@ -103,21 +113,26 @@ def scrapear_detalles_libro(url_libro):
 def guardar_en_db(libros):
     conn = sqlite3.connect("libros.db")
     cursor = conn.cursor()
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS authors (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE
     )""")
+
+    # MODIFICACIÓN: se añade category
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS books (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
+        category TEXT,
         price TEXT,
         stock TEXT,
         rating TEXT,
         upc TEXT UNIQUE,
         url TEXT
     )""")
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS book_authors (
         book_id INTEGER,
@@ -126,14 +141,18 @@ def guardar_en_db(libros):
         FOREIGN KEY (book_id) REFERENCES books(id),
         FOREIGN KEY (author_id) REFERENCES authors(id)
     )""")
+
     for libro in libros:
         if libro is None:
             continue
+
+        
         cursor.execute("""
-            INSERT OR IGNORE INTO books (title, price, stock, rating, upc, url)
-            VALUES (?, ?, ?, ?, ?, ?)""",
-            (libro["titulo"], libro["precio"], libro["stock"], libro["rating"], libro["upc"], libro["url"])
+            INSERT OR IGNORE INTO books (title, category, price, stock, rating, upc, url)
+            VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (libro["titulo"], libro["categoria"], libro["precio"], libro["stock"], libro["rating"], libro["upc"], libro["url"])
         )
+
         cursor.execute("SELECT id FROM books WHERE upc = ?", (libro["upc"],))
         libro_id = cursor.fetchone()[0]
 
@@ -143,18 +162,17 @@ def guardar_en_db(libros):
             autor_id = cursor.fetchone()[0]
             cursor.execute("INSERT OR IGNORE INTO book_authors (book_id, author_id) VALUES (?, ?)", (libro_id, autor_id))
 
-    conn.commit()      # guarda los cambios
-    conn.close()       # cierra la conexión
+    conn.commit()
+    conn.close()
 
 def main():
-    categorias = obtener_urls_categorias()  # obtiene todas las categorías
+    categorias = obtener_urls_categorias() 
     if not categorias:
         return
     libros_extraidos = []
 
-    # Por cada categoría...
     for url_categoria in categorias:
-        paginas = obtener_urls_paginas_categoria(url_categoria)  # todas las páginas de esa categoría
+        paginas = obtener_urls_paginas_categoria(url_categoria)  
         for url_pagina in paginas:
             libros_urls = obtener_urls_libros_en_pagina(url_pagina)
             for url_libro in libros_urls:
@@ -162,9 +180,9 @@ def main():
                 if detalles:
                     libros_extraidos.append(detalles)
                     print(f"Scrapeando: {detalles['titulo']} | Autores: {', '.join(detalles['autores'])}")
-                    time.sleep(1)  # pausa entre libros para no ser bloqueado
+                    time.sleep(1)  
 
-    guardar_en_db(libros_extraidos)  # guarda todos los libros en la base de datos
+    guardar_en_db(libros_extraidos)  
 
 if __name__ == "__main__":
     main()
