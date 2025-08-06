@@ -6,19 +6,19 @@ Este proyecto consiste en un scraping completo del sitio [Books to Scrape](https
 
 ## 📦 Estructura del proyecto
 
+```
 Database/
-├── scraper.py # Script de scraping web (requests + BeautifulSoup)
-├── libros.db # Base de datos SQLite relacional
-├── libros_exportados.csv # CSV con los libros scrapeados
-├── order.sql # Script de creación e inserción SQL (DDL + DML)
-├── analisis_libros.ipynb # Notebook de análisis exploratorio SQL
+├── scraper.py                  # Script de scraping web (requests + BeautifulSoup)
+├── libros.db                   # Base de datos SQLite relacional
+├── libros_exportados.csv       # CSV con los libros scrapeados
+├── order.sql                   # Script de creación e inserción SQL (DDL + DML)
+├── analisis_libros.ipynb       # Notebook de análisis exploratorio SQL
 ├── querys_practica_libros.ipynb # Consultas avanzadas de práctica
-├── .gitignore # Archivos y carpetas excluidos del repo
-├── README.md # Este archivo
-├── key.env # ⚠️ No subir a GitHub: contiene tu API key (ignorada por Git)
-└── .venv/ # Entorno virtual (excluido del repo)
-
-
+├── .gitignore                  # Archivos y carpetas excluidos del repo
+├── README.md                   # Este archivo
+├── key.env                     # ⚠️ No subir a GitHub: contiene tu API key (ignorada por Git)
+└── .venv/                      # Entorno virtual (excluido del repo)
+```
 
 ---
 
@@ -53,30 +53,50 @@ Database/
 
 ```bash
 pip install -r requirements.txt
-▶️ Cómo ejecutar
-Activar entorno virtual:
+```
 
+---
+
+## ▶️ Cómo ejecutar
+
+**Activar entorno virtual:**
+
+```bash
 # En Windows
 source .venv/Scripts/activate
-Ejecutar el scraper:
+```
 
+**Ejecutar el scraper:**
+
+```bash
 python scraper.py
-Crear la base de datos:
+```
 
+**Crear la base de datos:**
 
+```bash
 sqlite3 libros.db < order.sql
-Abrir los notebooks para análisis exploratorio:
+```
 
+**Abrir los notebooks para análisis exploratorio:**
 
+```bash
 jupyter notebook
-📂 Archivos sensibles
-Asegúrate de que el archivo key.env esté en el .gitignore y no se suba nunca al repositorio remoto, ya que contiene claves privadas.
+```
 
-📈 Consultas SQL interesantes
-¿Cuáles son las 5 categorías con mayor cantidad de libros?
+---
 
-¿Qué autores tienen más de un libro publicado?
+## 📂 Archivos sensibles
 
-¿Cuál es el precio promedio por categoría?
+Asegúrate de que el archivo `key.env` esté en el `.gitignore` y no se suba nunca al repositorio remoto, ya que contiene claves privadas.
 
-¿Cuál es el libro más caro disponible?
+---
+
+## 📈 Consultas SQL interesantes
+
+- ¿Cuáles son las 5 categorías con mayor cantidad de libros?
+- ¿Qué autores tienen más de un libro publicado?
+- ¿Cuál es el precio promedio por categoría?
+- ¿Cuál es el libro más caro disponible?
+
+---
