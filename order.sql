@@ -6,6 +6,7 @@ CREATE TABLE authors(
 CREATE TABLE books(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT,
+    category TEXT,
     price TEXT,
     stock TEXT,
     rating TEXT,
